@@ -14,7 +14,14 @@ class ShopController extends Controller
      */
     public function index()
     {
-        return view('shops.index');
+        $shops = Shop::all();
+
+        // 取得したデータの中心地を求める
+        $latitude = $shops->average('latitude');
+        $longitude = $shops->average('longitude');
+        $zoom = 5;
+
+        return view('shops.index', compact('shops', 'latitude', 'longitude', 'zoom'));
     }
 
     /**
@@ -24,7 +31,12 @@ class ShopController extends Controller
      */
     public function create()
     {
-        return view('shops.create');
+        // 最初に表示したい座標(今回は東京タワー)
+        $latitude = 35.658584;
+        $longitude = 139.7454316;
+        $zoom = 10;
+
+        return view('shops.create', compact('latitude', 'longitude', 'zoom'));
     }
 
     /**
@@ -35,7 +47,17 @@ class ShopController extends Controller
      */
     public function store(Request $request)
     {
-        //
+        $shop = new Shop();
+
+        // $shop->name = $request->name;
+        // $shop->description = $request->description;
+        // $shop->address = $request->address;
+        // $shop->latitude = $request->latitude;
+        // $shop->longitude = $request->longitude;
+        $shop->fill($request->all());
+        $shop->save();
+
+        return redirect()->route('shops.index');
     }
 
     /**
@@ -46,7 +68,11 @@ class ShopController extends Controller
      */
     public function show(Shop $shop)
     {
-        return view('shops.show');
+        $latitude = $shop->latitude;
+        $longitude = $shop->longitude;
+        $zoom = 12;
+
+        return view('shops.show', compact('shop', 'latitude', 'longitude', 'zoom'));
     }
 
     /**
@@ -57,7 +83,11 @@ class ShopController extends Controller
      */
     public function edit(Shop $shop)
     {
-        return view('shops.edit');
+        $latitude = $shop->latitude;
+        $longitude = $shop->longitude;
+        $zoom = 12;
+
+        return view('shops.edit', compact('shop', 'latitude', 'longitude', 'zoom'));
     }
 
     /**
@@ -69,7 +99,9 @@ class ShopController extends Controller
      */
     public function update(Request $request, Shop $shop)
     {
-        //
+        $shop->fill($request->all());
+        $shop->save();
+        return redirect()->route('shops.index');
     }
 
     /**
@@ -80,6 +112,7 @@ class ShopController extends Controller
      */
     public function destroy(Shop $shop)
     {
-        //
+        $shop->delete();
+        return redirect()->route('shops.index');
     }
 }
